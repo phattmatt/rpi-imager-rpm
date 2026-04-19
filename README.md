@@ -41,12 +41,14 @@ The repository includes two GitHub Actions workflows:
 - `Watch upstream releases` runs daily and opens a pull request when Raspberry Pi publishes a new upstream release.
 - `Build RPM` builds binary and source RPM artifacts for pull requests, pushes to `main`, manual runs, and tags named `rpm-v*`.
 
-To publish RPM artifacts on GitHub, merge the automated update PR after the build passes, then create a tag such as:
+To publish the installable binary RPM on GitHub, merge the automated update PR after the build passes, then create a tag such as:
 
 ```bash
 git tag rpm-v2.0.8-1
 git push origin rpm-v2.0.8-1
 ```
+
+Tagged releases publish only the main installable RPM, for example `rpi-imager-2.0.8-1.fc43.x86_64.rpm`. Debug and source RPMs remain available from workflow artifacts.
 
 ## Updating manually
 
