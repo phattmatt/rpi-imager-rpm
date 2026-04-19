@@ -64,12 +64,11 @@ BuildRequires:  pkgconfig(libzstd)
 BuildRequires:  pkgconfig(nettle)
 BuildRequires:  pkgconfig(zlib)
 
-Requires:       /usr/bin/lsblk
-Requires:       /usr/bin/pkexec
-Requires:       /usr/sbin/fdisk
-Requires:       /usr/sbin/mkfs.vfat
+Requires:       dosfstools
 Requires:       hicolor-icon-theme
+Requires:       polkit
 Requires:       shared-mime-info
+Requires:       util-linux
 Recommends:     udisks2
 
 %description
@@ -125,3 +124,4 @@ xmllint --noout %{buildroot}%{_datadir}/polkit-1/actions/com.raspberrypi.rpi-ima
 * Sun Apr 19 2026 rpi-imager-rpm maintainers <packagers@example.invalid> - 2.0.8-1
 - Initial RPM package for upstream 2.0.8.
 - Ship upstream Polkit policy, MIME registration, man page, and rpiboot udev rules.
+- Use package-level runtime dependencies so local dnf installs do not require filelists metadata.
