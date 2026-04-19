@@ -57,8 +57,13 @@ jobs:
           dnf -y install "$rpm_path"
           rpm -q rpi-imager
           rpm -ql rpi-imager
-          rpi-imager --version
-          rpi-imager --help
+          rpm -V rpi-imager
+          test -x /usr/bin/rpi-imager
+          test -f /usr/share/applications/com.raspberrypi.rpi-imager.desktop
+          test -f /usr/share/metainfo/com.raspberrypi.rpi-imager.metainfo.xml
+          test -f /usr/share/polkit-1/actions/com.raspberrypi.rpi-imager.policy
+          ldd /usr/bin/rpi-imager | tee /tmp/rpi-imager-ldd.txt
+          ! grep -q "not found" /tmp/rpi-imager-ldd.txt
 
       - name: Upload RPM artifacts
         uses: actions/upload-artifact@v4
