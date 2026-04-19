@@ -50,6 +50,16 @@ jobs:
         run: |
           rpmbuild -ba ./rpi-imager.spec --define "_topdir $PWD/.rpmbuild"
 
+      - name: Smoke test RPM install
+        run: |
+          rpm_path="$(find "$PWD/.rpmbuild/RPMS" -type f -name 'rpi-imager-*.rpm' ! -name '*.src.rpm' | sort | head -n 1)"
+          test -n "$rpm_path"
+          dnf -y install "$rpm_path"
+          rpm -q rpi-imager
+          rpm -ql rpi-imager
+          rpi-imager --version
+          rpi-imager --help
+
       - name: Upload RPM artifacts
         uses: actions/upload-artifact@v4
         with:
