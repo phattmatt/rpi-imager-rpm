@@ -1,0 +1,6 @@
+.rpmbuild/
+.verify/
+*.rpm
+*.src.rpm
+*.log
+/.cache/

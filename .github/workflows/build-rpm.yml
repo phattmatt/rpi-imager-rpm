@@ -1,0 +1,67 @@
+name: Build RPM
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - rpm-v*
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Upstream version to build, for example 2.0.8. Leave blank to use the spec.
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  rpm:
+    name: Fedora RPM
+    runs-on: ubuntu-latest
+    container: fedora:latest
+
+    steps:
+      - name: Check out packaging repo
+        uses: actions/checkout@v4
+
+      - name: Install RPM build tooling
+        run: |
+          dnf -y install dnf-plugins-core git python3 rpm-build rpmdevtools
+          dnf -y builddep ./rpi-imager.spec
+
+      - name: Apply manual version input
+        if: github.event_name == 'workflow_dispatch' && inputs.version != ''
+        run: |
+          python3 scripts/update-version.py --version "${{ inputs.version }}" --packager "GitHub Actions <actions@github.com>"
+
+      - name: Prepare rpmbuild tree
+        run: |
+          mkdir -p .rpmbuild/BUILD .rpmbuild/BUILDROOT .rpmbuild/RPMS .rpmbuild/SOURCES .rpmbuild/SPECS .rpmbuild/SRPMS
+          cp -a patches .rpmbuild/SOURCES/
+
+      - name: Fetch upstream source archive
+        run: |
+          spectool -g -C "$PWD/.rpmbuild/SOURCES" ./rpi-imager.spec
+
+      - name: Build source and binary RPMs
+        run: |
+          rpmbuild -ba ./rpi-imager.spec --define "_topdir $PWD/.rpmbuild"
+
+      - name: Upload RPM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: rpi-imager-rpms
+          path: |
+            .rpmbuild/RPMS/**/*.rpm
+            .rpmbuild/SRPMS/*.rpm
+
+      - name: Publish tag release
+        if: startsWith(github.ref, 'refs/tags/rpm-v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            .rpmbuild/RPMS/**/*.rpm
+            .rpmbuild/SRPMS/*.rpm

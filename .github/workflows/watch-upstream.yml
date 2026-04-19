@@ -1,0 +1,36 @@
+name: Watch upstream releases
+
+on:
+  schedule:
+    - cron: "23 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    name: Open update PR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out packaging repo
+        uses: actions/checkout@v4
+
+      - name: Update spec to latest upstream release
+        id: update
+        run: |
+          python3 scripts/update-version.py --latest --packager "GitHub Actions <actions@github.com>"
+
+      - name: Create update pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: update/rpi-imager-${{ steps.update.outputs.version }}
+          commit-message: Update rpi-imager to ${{ steps.update.outputs.version }}
+          title: Update rpi-imager to ${{ steps.update.outputs.version }}
+          body: |
+            Automated update to the latest upstream Raspberry Pi Imager release.
+
+            The RPM build workflow will build source and binary RPM artifacts for review.
+          labels: upstream-release

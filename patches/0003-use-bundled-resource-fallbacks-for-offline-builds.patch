@@ -1,0 +1,75 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: rpi-imager-rpm maintainers <packagers@example.invalid>
+Date: Sun, 19 Apr 2026 00:00:00 +0000
+Subject: [PATCH] Use bundled resource fallbacks for offline builds
+
+The resource generators normally try network downloads before falling back to
+files shipped in the source tree. RPM builds should be offline and should not
+spend time waiting on network timeouts.
+---
+ src/cmake/GenerateCapitalCities.cmake  | 10 ++++++++++
+ src/cmake/GenerateRegdbCountries.cmake | 11 +++++++++++
+ src/cmake/GenerateTimezones.cmake      | 11 +++++++++++
+ 3 files changed, 32 insertions(+)
+
+diff --git a/src/cmake/GenerateCapitalCities.cmake b/src/cmake/GenerateCapitalCities.cmake
+--- a/src/cmake/GenerateCapitalCities.cmake
++++ b/src/cmake/GenerateCapitalCities.cmake
+@@ -25,6 +25,16 @@ set(TMP_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+ set(JSON_FILE "${TMP_DIR}/restcountries.json")
+ set(FALLBACK_FILE "${SOURCE_DIR}/capital-cities.txt")
+ 
++if(DEFINED ENV{IMAGER_OFFLINE_BUILD} AND NOT "$ENV{IMAGER_OFFLINE_BUILD}" STREQUAL "")
++    message(STATUS "Using fallback capital cities list for offline build")
++    if(EXISTS "${FALLBACK_FILE}")
++        file(READ "${FALLBACK_FILE}" fallback_content)
++        file(WRITE "${OUTPUT_FILE}" "${fallback_content}")
++        return()
++    endif()
++    message(FATAL_ERROR "No fallback capital cities file found at ${FALLBACK_FILE}")
++endif()
++
+ message(STATUS "Downloading capital cities data from ${API_URL}")
+ 
+ # Download REST Countries data with user agent and better timeout
+diff --git a/src/cmake/GenerateRegdbCountries.cmake b/src/cmake/GenerateRegdbCountries.cmake
+--- a/src/cmake/GenerateRegdbCountries.cmake
++++ b/src/cmake/GenerateRegdbCountries.cmake
+@@ -25,6 +25,17 @@ endif()
+ set(TMP_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+ set(REGDB_FILE "${TMP_DIR}/wireless-regdb-db.txt")
+ 
++if(DEFINED ENV{IMAGER_OFFLINE_BUILD} AND NOT "$ENV{IMAGER_OFFLINE_BUILD}" STREQUAL "")
++    set(FALLBACK_FILE "${SOURCE_DIR}/countries.txt")
++    message(STATUS "Using fallback countries list for offline build")
++    if(EXISTS "${FALLBACK_FILE}")
++        file(READ "${FALLBACK_FILE}" fallback_content)
++        file(WRITE "${OUTPUT_FILE}" "${fallback_content}")
++        return()
++    endif()
++    message(FATAL_ERROR "No fallback countries file found at ${FALLBACK_FILE}")
++endif()
++
+ message(STATUS "Downloading wireless-regdb from ${REGDB_URL}")
+ 
+ file(DOWNLOAD "${REGDB_URL}" "${REGDB_FILE}"
+diff --git a/src/cmake/GenerateTimezones.cmake b/src/cmake/GenerateTimezones.cmake
+--- a/src/cmake/GenerateTimezones.cmake
++++ b/src/cmake/GenerateTimezones.cmake
+@@ -27,5 +27,16 @@ set(TZDATA_ARCHIVE "${TZDATA_DIR}/tzdata.tar.gz")
+ set(ZONE_TAB_FILE "${TZDATA_DIR}/zone.tab")
+ 
++if(DEFINED ENV{IMAGER_OFFLINE_BUILD} AND NOT "$ENV{IMAGER_OFFLINE_BUILD}" STREQUAL "")
++    set(FALLBACK_FILE "${SOURCE_DIR}/timezones.txt")
++    message(STATUS "Using fallback timezone list for offline build")
++    if(EXISTS "${FALLBACK_FILE}")
++        file(READ "${FALLBACK_FILE}" fallback_content)
++        file(WRITE "${OUTPUT_FILE}" "${fallback_content}")
++        return()
++    endif()
++    message(FATAL_ERROR "No fallback timezone file found at ${FALLBACK_FILE}")
++endif()
++
+ message(STATUS "Downloading IANA timezone data from ${TZDATA_URL}")
+ 
+ # Download the timezone data

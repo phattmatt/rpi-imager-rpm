@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: rpi-imager-rpm maintainers <packagers@example.invalid>
+Date: Sun, 19 Apr 2026 00:00:00 +0000
+Subject: [PATCH] Allow version override for archive builds
+
+Source archives do not include .git metadata, so git describe falls back to
+0.0.0-unknown. Let archive-based package builds provide the upstream tag via
+IMAGER_VERSION_OVERRIDE.
+---
+ src/cmake/GenerateVersion.cmake | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/cmake/GenerateVersion.cmake b/src/cmake/GenerateVersion.cmake
+--- a/src/cmake/GenerateVersion.cmake
++++ b/src/cmake/GenerateVersion.cmake
+@@ -12,7 +12,9 @@ find_package(Git QUIET)
+ 
+ set(VERSION_STR "0.0.0-unknown")
+ 
+-if(GIT_EXECUTABLE)
++if(DEFINED ENV{IMAGER_VERSION_OVERRIDE} AND NOT "$ENV{IMAGER_VERSION_OVERRIDE}" STREQUAL "")
++    set(VERSION_STR "$ENV{IMAGER_VERSION_OVERRIDE}")
++elseif(GIT_EXECUTABLE)
+     execute_process(
+         COMMAND "${GIT_EXECUTABLE}" describe --tags --always --dirty
+         WORKING_DIRECTORY "${SOURCE_DIR}"
