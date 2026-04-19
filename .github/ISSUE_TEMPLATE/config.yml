@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Raspberry Pi Imager upstream
+    url: https://github.com/raspberrypi/rpi-imager/issues
+    about: Report application behavior bugs that are not specific to this RPM package.
+  - name: Fedora packaging guidelines
+    url: https://docs.fedoraproject.org/en-US/packaging-guidelines/
+    about: Reference material for Fedora RPM packaging conventions.

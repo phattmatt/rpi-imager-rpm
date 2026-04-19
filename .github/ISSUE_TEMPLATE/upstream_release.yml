@@ -1,0 +1,31 @@
+name: New upstream release request
+description: Ask for this repo to package a new Raspberry Pi Imager release.
+title: "Package upstream "
+labels:
+  - upstream-release
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The repository checks upstream releases automatically, but this form is useful if a release was missed or needs attention.
+  - type: input
+    id: upstream_version
+    attributes:
+      label: Upstream version
+      placeholder: 2.0.9
+    validations:
+      required: true
+  - type: input
+    id: upstream_url
+    attributes:
+      label: Upstream release URL
+      placeholder: https://github.com/raspberrypi/rpi-imager/releases/tag/v2.0.9
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Mention any build changes, dependency changes, or urgent fixes in the upstream release notes.
+    validations:
+      required: false

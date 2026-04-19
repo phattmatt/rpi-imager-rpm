@@ -1,0 +1,72 @@
+name: RPM install problem
+description: Report a failure while installing the RPM with dnf or rpm.
+title: "Install problem: "
+labels:
+  - install-failure
+  - needs-info
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for dependency resolution errors, transaction failures, file conflicts, or other problems while installing the RPM.
+
+        Please paste command output as text, not screenshots.
+  - type: input
+    id: distro
+    attributes:
+      label: Distribution and version
+      description: For example, Fedora 43, Fedora Rawhide, Rocky Linux 10, or openSUSE Tumbleweed.
+      placeholder: Fedora 43
+    validations:
+      required: true
+  - type: dropdown
+    id: arch
+    attributes:
+      label: CPU architecture
+      options:
+        - x86_64
+        - aarch64
+        - other
+    validations:
+      required: true
+  - type: input
+    id: rpm_filename
+    attributes:
+      label: RPM filename
+      description: The exact file you tried to install.
+      placeholder: rpi-imager-2.0.8-1.fc43.x86_64.rpm
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Install command
+      description: Paste the exact command you ran.
+      render: bash
+      placeholder: sudo dnf install ./rpi-imager-2.0.8-1.fc43.x86_64.rpm
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Full install output
+      description: Include the complete dnf or rpm output, including dependency errors.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: repos
+    attributes:
+      label: Enabled repositories
+      description: Optional, but useful for dependency issues.
+      render: bash
+      placeholder: dnf repolist
+    validations:
+      required: false
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional notes
+      description: Anything unusual about the system, enabled COPRs, containers, VMs, or previous installs.
+    validations:
+      required: false

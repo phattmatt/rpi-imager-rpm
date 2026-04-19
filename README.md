@@ -50,6 +50,15 @@ git push origin rpm-v2.0.8-1
 
 Tagged releases publish only the main installable RPM, for example `rpi-imager-2.0.8-1.fc43.x86_64.rpm`. Debug and source RPMs remain available from workflow artifacts.
 
+## Support and contributing
+
+- Use the GitHub issue forms to report install, runtime, build, upstream-release, or packaging problems.
+- See [SUPPORT.md](SUPPORT.md) for where to report packaging issues versus upstream Raspberry Pi Imager issues.
+- See [CONTRIBUTING.md](CONTRIBUTING.md) for local build, smoke test, update, and release tag guidance.
+- See [docs/troubleshooting.md](docs/troubleshooting.md) for common install and runtime checks.
+- See [docs/release-checklist.md](docs/release-checklist.md) when publishing a new RPM release.
+- See [docs/labels.md](docs/labels.md) for the suggested issue label set.
+
 ## Updating manually
 
 To bump the spec to a specific upstream release:

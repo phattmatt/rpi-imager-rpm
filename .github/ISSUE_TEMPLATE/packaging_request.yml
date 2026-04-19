@@ -1,0 +1,27 @@
+name: Packaging improvement request
+description: Suggest a dependency, spec, workflow, release, or documentation improvement.
+title: "Packaging request: "
+labels:
+  - packaging
+body:
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What should change in this RPM packaging repository?
+    validations:
+      required: true
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Why is this useful?
+      description: Explain the user-visible benefit, compatibility impact, or packaging guideline involved.
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Implementation details
+      description: Optional links, commands, packages, spec changes, or affected distributions.
+    validations:
+      required: false

@@ -1,0 +1,59 @@
+name: Build or CI problem
+description: Report a failure while building the RPM locally or in GitHub Actions.
+title: "Build problem: "
+labels:
+  - build-failure
+  - needs-info
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for failed local RPM builds, failed GitHub Actions runs, or problems with the packaging scripts.
+  - type: dropdown
+    id: build_location
+    attributes:
+      label: Where did the build fail?
+      options:
+        - Local Fedora machine or VM
+        - GitHub Actions
+        - Container
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: distro
+    attributes:
+      label: Build environment
+      placeholder: Fedora 43 x86_64 VM
+    validations:
+      required: true
+  - type: input
+    id: upstream_version
+    attributes:
+      label: Upstream rpi-imager version
+      placeholder: 2.0.8
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Build command or Actions link
+      render: text
+      placeholder: bash scripts/build-rpm.sh --install-deps
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Relevant build log
+      description: Include enough log output to show the first real error.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: local_changes
+    attributes:
+      label: Local changes
+      description: If you modified the spec, patches, scripts, or workflow, describe the change.
+    validations:
+      required: false

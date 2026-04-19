@@ -1,0 +1,80 @@
+name: Runtime or launch problem
+description: Report a problem after the RPM has installed successfully.
+title: "Runtime problem: "
+labels:
+  - runtime-failure
+  - needs-info
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form when the RPM installs, but Raspberry Pi Imager does not launch or does not behave correctly on your RPM-based system.
+
+        If the same problem happens with upstream Raspberry Pi Imager builds, please report it upstream instead.
+  - type: input
+    id: distro
+    attributes:
+      label: Distribution and version
+      placeholder: Fedora 43
+    validations:
+      required: true
+  - type: dropdown
+    id: desktop
+    attributes:
+      label: Desktop session
+      options:
+        - GNOME Wayland
+        - GNOME X11
+        - KDE Plasma Wayland
+        - KDE Plasma X11
+        - Other
+        - Headless or container
+    validations:
+      required: true
+  - type: input
+    id: rpm_version
+    attributes:
+      label: Installed package version
+      description: Output from rpm -q rpi-imager.
+      placeholder: rpi-imager-2.0.8-1.fc43.x86_64
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the visible failure and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: terminal_output
+    attributes:
+      label: Terminal output
+      description: Run rpi-imager from a terminal and paste the output.
+      render: text
+      placeholder: rpi-imager
+    validations:
+      required: true
+  - type: textarea
+    id: package_checks
+    attributes:
+      label: Package verification
+      description: Please run these commands and paste their output.
+      render: bash
+      placeholder: |
+        rpm -qi rpi-imager
+        rpm -V rpi-imager
+        ldd /usr/bin/rpi-imager | grep "not found" || true
+    validations:
+      required: false
+  - type: dropdown
+    id: upstream_tested
+    attributes:
+      label: Did you test an upstream build on the same machine?
+      options:
+        - Not tested
+        - Upstream works
+        - Upstream has the same problem
+        - Upstream does not run on this system
+    validations:
+      required: false
