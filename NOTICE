@@ -1,0 +1,13 @@
+Raspberry Pi Imager RPM packaging
+Copyright 2026 Matt
+
+This repository contains RPM packaging files, patches, helper scripts, and
+GitHub Actions workflows for building Fedora-style RPM packages of Raspberry Pi
+Imager.
+
+Raspberry Pi Imager itself is maintained by Raspberry Pi Ltd and is licensed
+upstream under the Apache License, Version 2.0. This packaging repository does
+not change the upstream project's copyright or license terms.
+
+The packaging files and helper scripts in this repository are licensed under
+the Apache License, Version 2.0.

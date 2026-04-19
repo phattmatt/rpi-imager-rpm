@@ -71,3 +71,7 @@ The RPM spec applies small build-system patches so the package can build from a 
 - system libraries are used instead of CMake `FetchContent` downloads;
 - the upstream version is provided explicitly because GitHub source archives do not include `.git`;
 - generated timezone, country, and capital-city resources use the fallback files already shipped in the upstream source tree.
+
+## License
+
+This packaging repository is licensed under the Apache License 2.0. Raspberry Pi Imager itself remains upstream's project and is licensed by Raspberry Pi Ltd under the Apache License 2.0.
