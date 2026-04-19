@@ -24,9 +24,9 @@ License:        Apache-2.0
 URL:            https://github.com/raspberrypi/rpi-imager
 Source0:        %{url}/archive/refs/tags/v%{version}/%{name}-%{version}.tar.gz
 
-Patch0:         patches/0001-use-system-libraries-for-rpm-builds.patch
-Patch1:         patches/0002-allow-version-override-for-archive-builds.patch
-Patch2:         patches/0003-use-bundled-resource-fallbacks-for-offline-builds.patch
+Patch0:         0001-use-system-libraries-for-rpm-builds.patch
+Patch1:         0002-allow-version-override-for-archive-builds.patch
+Patch2:         0003-use-bundled-resource-fallbacks-for-offline-builds.patch
 
 ExclusiveArch:  x86_64 aarch64
 

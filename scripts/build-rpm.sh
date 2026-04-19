@@ -41,8 +41,8 @@ mkdir -p \
     "${topdir}/SRPMS"
 
 spectool -g -C "${topdir}/SOURCES" "${repo_root}/rpi-imager.spec"
-rm -rf "${topdir}/SOURCES/patches"
-cp -a "${repo_root}/patches" "${topdir}/SOURCES/"
+rm -f "${topdir}/SOURCES/"*.patch
+cp -a "${repo_root}/patches/"*.patch "${topdir}/SOURCES/"
 
 rpmbuild -ba "${repo_root}/rpi-imager.spec" --define "_topdir ${topdir}"
 

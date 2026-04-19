@@ -24,7 +24,7 @@ Build the RPMs:
 ```bash
 mkdir -p .rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 spectool -g -C "$PWD/.rpmbuild/SOURCES" ./rpi-imager.spec
-cp -a patches "$PWD/.rpmbuild/SOURCES/"
+cp -a patches/*.patch "$PWD/.rpmbuild/SOURCES/"
 rpmbuild -ba ./rpi-imager.spec --define "_topdir $PWD/.rpmbuild"
 ```
 
