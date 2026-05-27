@@ -14,11 +14,11 @@
 %endif
 
 %global udevrulesdir %{_prefix}/lib/udev/rules.d
-%global upstream_version 2.0.8
+%global upstream_version 2.0.9
 %global upstream_tag v%{upstream_version}
 
 Name:           rpi-imager
-Version:        2.0.8
+Version:        2.0.9
 Release:        1%{?dist}
 Summary:        Raspberry Pi Imaging utility
 
@@ -123,6 +123,8 @@ xmllint --noout %{buildroot}%{_datadir}/polkit-1/actions/com.raspberrypi.rpi-ima
 %{udevrulesdir}/99-rpiboot.rules
 
 %changelog
+* Wed May 27 2026 rpi-imager-rpm maintainers <packagers@example.invalid> - 2.0.9-1
+- Update to upstream 2.0.9 prerelease.
 * Sun Apr 19 2026 rpi-imager-rpm maintainers <packagers@example.invalid> - 2.0.8-1
 - Initial RPM package for upstream 2.0.8.
 - Ship upstream Polkit policy, MIME registration, man page, and rpiboot udev rules.
