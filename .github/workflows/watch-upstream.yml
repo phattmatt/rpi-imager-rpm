@@ -38,9 +38,11 @@ jobs:
         run: |
           title="Update rpi-imager to ${{ steps.update.outputs.upstream_version }}"
           prerelease_note=""
+          labels="upstream-release"
           if [[ "${{ steps.update.outputs.prerelease }}" == "true" ]]; then
             title="${title} (prerelease)"
             prerelease_note="> Note: this automated update targets an upstream prerelease."
+            labels="${labels}, prerelease"
           fi
 
           {
@@ -59,6 +61,7 @@ jobs:
             echo "Selected upstream tag: \`${{ steps.update.outputs.upstream_tag }}\`"
             echo "RPM package version: \`${{ steps.update.outputs.version }}\`"
             echo "EOF"
+            echo "labels=$labels"
           } >> "$GITHUB_OUTPUT"
 
       - name: Create update pull request
@@ -68,4 +71,5 @@ jobs:
           commit-message: Update rpi-imager to ${{ steps.update.outputs.upstream_version }}
           title: ${{ steps.pr.outputs.title }}
           body: ${{ steps.pr.outputs.body }}
-          labels: upstream-release
+          labels: ${{ steps.pr.outputs.labels }}
+          delete-branch: true

@@ -73,9 +73,46 @@ jobs:
             .rpmbuild/RPMS/**/*.rpm
             .rpmbuild/SRPMS/*.rpm
 
+      - name: Detect upstream release metadata
+        id: release_meta
+        if: startsWith(github.ref, 'refs/tags/rpm-v')
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+        run: |
+          upstream_version="$(sed -n 's/^%global upstream_version[[:space:]]\+\(.*\)$/\1/p' rpi-imager.spec)"
+          test -n "$upstream_version"
+          export UPSTREAM_VERSION="$upstream_version"
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.request
+
+          upstream_version = os.environ["UPSTREAM_VERSION"]
+          ref_name = os.environ["GITHUB_REF_NAME"]
+          url = f"https://api.github.com/repos/raspberrypi/rpi-imager/releases/tags/v{upstream_version}"
+          request = urllib.request.Request(
+              url,
+              headers={
+                  "Accept": "application/vnd.github+json",
+                  "User-Agent": "rpi-imager-rpm-release-meta",
+              },
+          )
+          with urllib.request.urlopen(request, timeout=30) as response:
+              data = json.load(response)
+
+          prerelease = bool(data.get("prerelease"))
+          release_name = f"{ref_name} (prerelease)" if prerelease else ref_name
+
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as handle:
+              handle.write(f"prerelease={'true' if prerelease else 'false'}\n")
+              handle.write(f"release_name={release_name}\n")
+          PY
+
       - name: Publish tag release
         if: startsWith(github.ref, 'refs/tags/rpm-v')
         uses: softprops/action-gh-release@v2
         with:
+          name: ${{ steps.release_meta.outputs.release_name }}
+          prerelease: ${{ steps.release_meta.outputs.prerelease }}
           files: |
             .rpmbuild/RPMS/*/rpi-imager-[0-9]*.rpm
