@@ -19,7 +19,7 @@
 
 Name:           rpi-imager
 Version:        2.0.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Raspberry Pi Imaging utility
 
 License:        Apache-2.0
@@ -123,6 +123,8 @@ xmllint --noout %{buildroot}%{_datadir}/polkit-1/actions/com.raspberrypi.rpi-ima
 %{udevrulesdir}/99-rpiboot.rules
 
 %changelog
+* Wed May 27 2026 rpi-imager-rpm maintainers <packagers@example.invalid> - 2.0.9-2
+- Publish prerelease RPMs as GitHub prereleases with an explicit release note.
 * Wed May 27 2026 rpi-imager-rpm maintainers <packagers@example.invalid> - 2.0.9-1
 - Update to upstream 2.0.9 prerelease.
 * Sun Apr 19 2026 rpi-imager-rpm maintainers <packagers@example.invalid> - 2.0.8-1

@@ -102,10 +102,32 @@ jobs:
 
           prerelease = bool(data.get("prerelease"))
           release_name = f"{ref_name} (prerelease)" if prerelease else ref_name
+          lines = [
+              f"Automated RPM build for upstream tag `v{upstream_version}`.",
+              "",
+          ]
+          if prerelease:
+              lines.extend(
+                  [
+                      "> Note: this RPM tracks an upstream Raspberry Pi Imager prerelease.",
+                      "",
+                  ]
+              )
+          lines.extend(
+              [
+                  f"RPM package version: `{ref_name.removeprefix('rpm-v')}`",
+                  "",
+                  "Published asset: installable binary RPM only.",
+              ]
+          )
+          release_body = "\n".join(lines)
 
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as handle:
               handle.write(f"prerelease={'true' if prerelease else 'false'}\n")
               handle.write(f"release_name={release_name}\n")
+              handle.write("release_body<<EOF\n")
+              handle.write(release_body)
+              handle.write("\nEOF\n")
           PY
 
       - name: Publish tag release
@@ -114,5 +136,6 @@ jobs:
         with:
           name: ${{ steps.release_meta.outputs.release_name }}
           prerelease: ${{ steps.release_meta.outputs.prerelease }}
+          body: ${{ steps.release_meta.outputs.release_body }}
           files: |
             .rpmbuild/RPMS/*/rpi-imager-[0-9]*.rpm
