@@ -78,8 +78,8 @@ For prereleases, the updater converts upstream tags such as `2.0.7-rc2` into RPM
 After the update is merged and the build passes, create an RPM release tag:
 
 ```bash
-git tag rpm-v2.0.9-2
-git push origin rpm-v2.0.9-2
+git tag rpm-v2.0.9-1
+git push origin rpm-v2.0.9-1
 ```
 
 For prereleases, keep the Git tag in upstream-style form because Git refs cannot contain `~`:

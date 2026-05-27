@@ -28,8 +28,8 @@ Use this checklist when publishing a new RPM for an upstream Raspberry Pi Imager
 Example:
 
 ```bash
-git tag rpm-v2.0.9-2
-git push origin rpm-v2.0.9-2
+git tag rpm-v2.0.9-1
+git push origin rpm-v2.0.9-1
 ```
 
 Prerelease example:

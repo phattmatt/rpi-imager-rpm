@@ -2,6 +2,8 @@
 
 This repository packages [raspberrypi/rpi-imager](https://github.com/raspberrypi/rpi-imager) as an RPM for Fedora-style distributions.
 
+**Status:** Tracking upstream prerelease `v2.0.9`.
+
 The current spec tracks upstream prerelease `v2.0.9`. Upstream's Linux build requires Qt 6.9 or newer, so older RPM distributions may need newer Qt packages before this will build.
 
 ## Build locally on Fedora
@@ -44,13 +46,13 @@ The repository includes two GitHub Actions workflows:
 To publish the installable binary RPM on GitHub, merge the automated update PR after the build passes, then create a tag such as:
 
 ```bash
-git tag rpm-v2.0.9-2
-git push origin rpm-v2.0.9-2
+git tag rpm-v2.0.9-1
+git push origin rpm-v2.0.9-1
 ```
 
 For prereleases, keep the Git tag in upstream-style form so it remains a valid Git ref, for example `rpm-v2.0.7-rc2-1`.
 
-Tagged releases publish only the main installable RPM, for example `rpi-imager-2.0.9-2.fc44.x86_64.rpm` or `rpi-imager-2.0.7~rc2-1.fc44.x86_64.rpm`. Debug and source RPMs remain available from workflow artifacts.
+Tagged releases publish only the main installable RPM, for example `rpi-imager-2.0.9-1.fc44.x86_64.rpm` or `rpi-imager-2.0.7~rc2-1.fc44.x86_64.rpm`. Debug and source RPMs remain available from workflow artifacts.
 
 ## Support and contributing
 
