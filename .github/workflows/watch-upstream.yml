@@ -33,17 +33,39 @@ jobs:
           fi
           python3 scripts/update-version.py "${args[@]}"
 
+      - name: Prepare pull request metadata
+        id: pr
+        run: |
+          title="Update rpi-imager to ${{ steps.update.outputs.upstream_version }}"
+          prerelease_note=""
+          if [[ "${{ steps.update.outputs.prerelease }}" == "true" ]]; then
+            title="${title} (prerelease)"
+            prerelease_note="> Note: this automated update targets an upstream prerelease."
+          fi
+
+          {
+            echo "title<<EOF"
+            echo "$title"
+            echo "EOF"
+            echo "body<<EOF"
+            echo "Automated update to the latest upstream Raspberry Pi Imager release."
+            echo
+            if [[ -n "$prerelease_note" ]]; then
+              echo "$prerelease_note"
+              echo
+            fi
+            echo "The RPM build workflow will build source and binary RPM artifacts for review."
+            echo
+            echo "Selected upstream tag: \`${{ steps.update.outputs.upstream_tag }}\`"
+            echo "RPM package version: \`${{ steps.update.outputs.version }}\`"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Create update pull request
         uses: peter-evans/create-pull-request@v6
         with:
           branch: update/rpi-imager-${{ steps.update.outputs.branch_version }}
           commit-message: Update rpi-imager to ${{ steps.update.outputs.upstream_version }}
-          title: Update rpi-imager to ${{ steps.update.outputs.upstream_version }}
-          body: |
-            Automated update to the latest upstream Raspberry Pi Imager release.
-
-            The RPM build workflow will build source and binary RPM artifacts for review.
-
-            Selected upstream tag: `${{ steps.update.outputs.upstream_tag }}`
-            RPM package version: `${{ steps.update.outputs.version }}`
+          title: ${{ steps.pr.outputs.title }}
+          body: ${{ steps.pr.outputs.body }}
           labels: upstream-release
