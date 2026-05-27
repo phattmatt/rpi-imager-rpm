@@ -63,7 +63,15 @@ To update to GitHub's latest upstream release:
 python3 scripts/update-version.py --latest --packager "Your Name <you@example.com>"
 ```
 
+To allow prereleases while selecting the latest GitHub release:
+
+```bash
+python3 scripts/update-version.py --latest --include-prereleases --packager "Your Name <you@example.com>"
+```
+
 Then build the RPM and review whether the existing patches still apply cleanly.
+
+For prereleases, the updater converts upstream tags such as `2.0.7-rc2` into RPM versions such as `2.0.7~rc2` so the eventual stable release still upgrades cleanly.
 
 ## Release tags
 
@@ -72,6 +80,13 @@ After the update is merged and the build passes, create an RPM release tag:
 ```bash
 git tag rpm-v2.0.9-1
 git push origin rpm-v2.0.9-1
+```
+
+For prereleases, keep the Git tag in upstream-style form because Git refs cannot contain `~`:
+
+```bash
+git tag rpm-v2.0.7-rc2-1
+git push origin rpm-v2.0.7-rc2-1
 ```
 
 The tag workflow publishes only the installable binary RPM to the GitHub Release. Debug and source RPMs remain available from workflow artifacts.

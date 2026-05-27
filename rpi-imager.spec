@@ -14,6 +14,8 @@
 %endif
 
 %global udevrulesdir %{_prefix}/lib/udev/rules.d
+%global upstream_version 2.0.8
+%global upstream_tag v%{upstream_version}
 
 Name:           rpi-imager
 Version:        2.0.8
@@ -22,7 +24,7 @@ Summary:        Raspberry Pi Imaging utility
 
 License:        Apache-2.0
 URL:            https://github.com/raspberrypi/rpi-imager
-Source0:        %{url}/archive/refs/tags/v%{version}/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/%{upstream_tag}/%{name}-%{upstream_version}.tar.gz
 
 Patch0:         0001-use-system-libraries-for-rpm-builds.patch
 Patch1:         0002-allow-version-override-for-archive-builds.patch
@@ -76,11 +78,11 @@ Raspberry Pi Imager is a user-friendly tool for creating bootable media for
 Raspberry Pi devices.
 
 %prep
-%autosetup -n %{name}-%{version} -p1
+%autosetup -n %{name}-%{upstream_version} -p1
 
 %build
 export RPM_USE_SYSTEM_LIBS=1
-export IMAGER_VERSION_OVERRIDE=v%{version}
+export IMAGER_VERSION_OVERRIDE=%{upstream_tag}
 export IMAGER_OFFLINE_BUILD=1
 
 %cmake src \
