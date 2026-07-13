@@ -22,6 +22,7 @@ Use this checklist when publishing a new RPM for an upstream Raspberry Pi Imager
 - Confirm source and binary RPM artifacts were produced.
 - Confirm the install smoke test passed.
 - Review any dependency or file list changes.
+- If the upstream release is a prerelease, expect the RPM metadata version to keep `~rc` ordering while the published RPM filename uses `.rc`.
 
 ## Publish
 
@@ -29,6 +30,7 @@ Use this checklist when publishing a new RPM for an upstream Raspberry Pi Imager
 - Create and push a tag using the `rpm-v<upstream-version>-<rpm-release>` format.
 - For prereleases, keep the Git tag in upstream-style form and do not use `~` in the Git ref.
 - Confirm the GitHub Release contains only the installable binary RPM.
+- For prereleases, confirm the published asset filename matches the built RPM form, for example `rpi-imager-2.0.11.rc1-1.fc44.x86_64.rpm`.
 - Confirm debug and source RPMs remain workflow artifacts only.
 
 Stable example:

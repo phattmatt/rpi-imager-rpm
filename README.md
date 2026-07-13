@@ -53,7 +53,7 @@ git push origin rpm-v2.0.11-rc1-1
 
 For prereleases, keep the Git tag in upstream-style form so it remains a valid Git ref, for example `rpm-v2.0.7-rc2-1`.
 
-Tagged releases publish only the main installable RPM, for example `rpi-imager-2.0.11~rc1-1.fc44.x86_64.rpm` or `rpi-imager-2.0.7~rc2-1.fc44.x86_64.rpm`. Debug and source RPMs remain available from workflow artifacts.
+Tagged releases publish only the main installable RPM, for example `rpi-imager-2.0.11.rc1-1.fc44.x86_64.rpm` or `rpi-imager-2.0.7.rc2-1.fc44.x86_64.rpm`. Debug and source RPMs remain available from workflow artifacts.
 
 ## Support and contributing
 
@@ -91,7 +91,7 @@ The RPM spec applies small build-system changes so the package can build from a 
 - a prep-time helper switches several bundled dependencies to system libraries instead of CMake `FetchContent` downloads;
 - the upstream version is provided explicitly because GitHub source archives do not include `.git`;
 - generated timezone and country resources already fall back to files shipped in the upstream source tree.
-- prerelease upstream tags such as `2.0.7-rc2` are converted to RPM versions such as `2.0.7~rc2` so upgrades sort correctly.
+- prerelease upstream tags such as `2.0.7-rc2` are converted to RPM versions such as `2.0.7~rc2` so upgrades sort correctly, while the generated RPM filename uses `.rc2`.
 
 ## License
 
