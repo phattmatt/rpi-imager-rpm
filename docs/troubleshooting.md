@@ -29,6 +29,8 @@ Start Raspberry Pi Imager from a terminal:
 rpi-imager
 ```
 
+Prefer launching the RPM build as your normal desktop user during troubleshooting. The packaged binary handles privilege elevation itself when it needs device access.
+
 Check the installed package and shared library links:
 
 ```bash
@@ -38,6 +40,14 @@ ldd /usr/bin/rpi-imager | grep "not found" || true
 ```
 
 If any library is shown as `not found`, open a runtime issue and include the output.
+
+## AppImage and RPM terminal output differ
+
+This is expected in some cases.
+
+The upstream AppImage wraps the real `rpi-imager` binary in an `AppRun` launcher that prepares bundled library paths and, when started as root, may also adjust `DISPLAY`, `XAUTHORITY`, and X11 access before executing the binary. The RPM package installs `/usr/bin/rpi-imager` directly, so those AppImage launcher lines do not appear in RPM terminal output.
+
+When comparing behavior between the two package formats, focus on the lines emitted after the application itself starts rather than on the AppImage-specific launcher output.
 
 ## Permission prompts or device access do not work
 
