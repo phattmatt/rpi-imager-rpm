@@ -2,6 +2,12 @@
 
 Use this checklist when publishing a new RPM for an upstream Raspberry Pi Imager release.
 
+## Choose the release line
+
+- Stable releases should normally be published from `main`.
+- Prereleases should normally be published from the active prerelease branch, for example `update/rpi-imager-2.0.11-rc1`.
+- Confirm the branch README and `rpi-imager.spec` agree about which upstream version is being published.
+
 ## Prepare
 
 - Confirm the upstream release tag exists at `raspberrypi/rpi-imager`.
@@ -25,16 +31,18 @@ Use this checklist when publishing a new RPM for an upstream Raspberry Pi Imager
 - Confirm the GitHub Release contains only the installable binary RPM.
 - Confirm debug and source RPMs remain workflow artifacts only.
 
-Example:
+Stable example:
 
 ```bash
-git tag rpm-v2.0.9-1
-git push origin rpm-v2.0.9-1
+git switch main
+git tag rpm-v2.0.10-1
+git push origin rpm-v2.0.10-1
 ```
 
 Prerelease example:
 
 ```bash
-git tag rpm-v2.0.7-rc2-1
-git push origin rpm-v2.0.7-rc2-1
+git switch update/rpi-imager-2.0.11-rc1
+git tag rpm-v2.0.11-rc1-1
+git push origin rpm-v2.0.11-rc1-1
 ```
