@@ -14,11 +14,11 @@
 %endif
 
 %global udevrulesdir %{_prefix}/lib/udev/rules.d
-%global upstream_version 2.0.10
+%global upstream_version 2.0.11-rc1
 %global upstream_tag v%{upstream_version}
 
 Name:           rpi-imager
-Version:        2.0.10
+Version:        2.0.11~rc1
 Release:        1%{?dist}
 Summary:        Raspberry Pi Imaging utility
 
@@ -123,6 +123,8 @@ xmllint --noout %{buildroot}%{_datadir}/polkit-1/actions/com.raspberrypi.rpi-ima
 %{udevrulesdir}/99-rpiboot.rules
 
 %changelog
+* Mon Jul 13 2026 GitHub Actions <actions@github.com> - 2.0.11~rc1-1
+- Update to upstream 2.0.11-rc1.
 * Wed Jul 08 2026 GitHub Actions <actions@github.com> - 2.0.10-1
 - Update to upstream 2.0.10.
 * Wed May 27 2026 rpi-imager-rpm maintainers <packagers@example.invalid> - 2.0.9-1
