@@ -2,9 +2,9 @@
 
 This repository packages [raspberrypi/rpi-imager](https://github.com/raspberrypi/rpi-imager) as an RPM for Fedora-style distributions.
 
-**Status:** Tracking upstream stable release `v2.0.10`.
+**Status:** Tracking upstream prerelease `v2.0.11-rc1`.
 
-The current spec tracks upstream stable release `v2.0.10`. Upstream's Linux build requires Qt 6.9 or newer, so older RPM distributions may need newer Qt packages before this will build.
+The current spec tracks upstream prerelease `v2.0.11-rc1`. Upstream's Linux build requires Qt 6.9 or newer, so older RPM distributions may need newer Qt packages before this will build.
 
 ## Build locally on Fedora
 
