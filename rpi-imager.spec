@@ -25,10 +25,9 @@ Summary:        Raspberry Pi Imaging utility
 License:        Apache-2.0
 URL:            https://github.com/raspberrypi/rpi-imager
 Source0:        %{url}/archive/refs/tags/%{upstream_tag}/%{name}-%{upstream_version}.tar.gz
+Source1:        apply-system-library-overrides.py
 
-Patch0:         0001-use-system-libraries-for-rpm-builds.patch
-Patch1:         0002-allow-version-override-for-archive-builds.patch
-Patch2:         0003-use-bundled-resource-fallbacks-for-offline-builds.patch
+Patch0:         0002-allow-version-override-for-archive-builds.patch
 
 ExclusiveArch:  x86_64 aarch64
 
@@ -79,6 +78,7 @@ Raspberry Pi devices.
 
 %prep
 %autosetup -n %{name}-%{upstream_version} -p1
+python3 %{SOURCE1}
 
 %build
 export RPM_USE_SYSTEM_LIBS=1

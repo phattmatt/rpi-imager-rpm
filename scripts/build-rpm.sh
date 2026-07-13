@@ -43,6 +43,7 @@ mkdir -p \
 spectool -g -C "${topdir}/SOURCES" "${repo_root}/rpi-imager.spec"
 rm -f "${topdir}/SOURCES/"*.patch
 cp -a "${repo_root}/patches/"*.patch "${topdir}/SOURCES/"
+cp -a "${repo_root}/scripts/apply-system-library-overrides.py" "${topdir}/SOURCES/"
 
 rpmbuild -ba "${repo_root}/rpi-imager.spec" --define "_topdir ${topdir}"
 
