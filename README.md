@@ -47,13 +47,13 @@ The repository includes two GitHub Actions workflows:
 To publish the installable binary RPM on GitHub, merge the automated update PR after the build passes, then create a tag such as:
 
 ```bash
-git tag rpm-v2.0.10-1
-git push origin rpm-v2.0.10-1
+git tag rpm-v2.0.11-rc1-1
+git push origin rpm-v2.0.11-rc1-1
 ```
 
 For prereleases, keep the Git tag in upstream-style form so it remains a valid Git ref, for example `rpm-v2.0.7-rc2-1`.
 
-Tagged releases publish only the main installable RPM, for example `rpi-imager-2.0.10-1.fc44.x86_64.rpm` or `rpi-imager-2.0.7~rc2-1.fc44.x86_64.rpm`. Debug and source RPMs remain available from workflow artifacts.
+Tagged releases publish only the main installable RPM, for example `rpi-imager-2.0.11~rc1-1.fc44.x86_64.rpm` or `rpi-imager-2.0.7~rc2-1.fc44.x86_64.rpm`. Debug and source RPMs remain available from workflow artifacts.
 
 ## Support and contributing
 
@@ -69,7 +69,7 @@ Tagged releases publish only the main installable RPM, for example `rpi-imager-2
 To bump the spec to a specific upstream release:
 
 ```bash
-python3 scripts/update-version.py --version 2.0.10 --packager "Your Name <you@example.com>"
+python3 scripts/update-version.py --version 2.0.11-rc1 --packager "Your Name <you@example.com>"
 ```
 
 To bump to GitHub's latest upstream release:
