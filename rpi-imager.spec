@@ -19,7 +19,7 @@
 
 Name:           rpi-imager
 Version:        2.0.11.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Raspberry Pi Imaging utility
 
 License:        Apache-2.0
@@ -40,6 +40,7 @@ BuildRequires:  libxml2
 BuildRequires:  make
 BuildRequires:  ninja-build
 BuildRequires:  pkgconfig
+BuildRequires:  python3
 BuildRequires:  shared-mime-info
 
 BuildRequires:  cmake(Qt6Core) >= 6.9
@@ -123,6 +124,11 @@ xmllint --noout %{buildroot}%{_datadir}/polkit-1/actions/com.raspberrypi.rpi-ima
 %{udevrulesdir}/99-rpiboot.rules
 
 %changelog
+* Tue Sep 22 2026 phattmatt <19799332+phattmatt@users.noreply.github.com> - 2.0.11.1-2
+- Declare the Python build dependency used during source preparation.
+- Consolidate builds and validate clean installation and release metadata.
+- Guard version updates against downgrades and refresh packaging documentation.
+
 * Sat Aug 22 2026 GitHub Actions <actions@github.com> - 2.0.11.1-1
 - Update to upstream 2.0.11.1.
 * Fri Aug 14 2026 GitHub Actions <actions@github.com> - 2.0.11-1

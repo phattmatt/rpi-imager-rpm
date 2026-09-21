@@ -9,6 +9,7 @@ These labels match the issue forms and maintenance workflow used by this reposit
 | `build-failure` | Local RPM build or GitHub Actions build failures. |
 | `dependency` | BuildRequires, Requires, Recommends, or Fedora repository issues. |
 | `upstream-release` | Tracking a new upstream Raspberry Pi Imager release. |
+| `prerelease` | Automated updates targeting an upstream prerelease. |
 | `packaging` | RPM spec, patch, script, workflow, or release artifact changes. |
 | `fedora` | Fedora-specific behavior or compatibility. |
 | `needs-info` | Waiting for reporter details or command output. |

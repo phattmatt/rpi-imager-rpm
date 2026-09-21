@@ -116,13 +116,25 @@ def changelog_date() -> str:
     return dt.datetime.now(dt.timezone.utc).strftime("%a %b %d %Y")
 
 
-def update_spec(upstream_version: str, packager: str, prerelease: bool) -> bool:
+def update_spec(upstream_version: str, packager: str, prerelease: bool,
+                allow_downgrade: bool = False, automatic: bool = False) -> bool:
     text = SPEC.read_text(encoding="utf-8")
     current = spec_version(text)
     current_upstream = spec_upstream_version(text)
     rpm_version = rpm_version_from_upstream(upstream_version)
     upstream_tag = f"v{upstream_version}"
     branch_version = branch_version_from_upstream(upstream_version)
+
+    try:
+        import rpm
+    except ImportError as exc:
+        raise SystemExit("Install python3-rpm to compare RPM versions safely") from exc
+    older = rpm.labelCompare(("0", rpm_version, "0"), ("0", current, "0")) < 0
+    if older and not allow_downgrade:
+        if automatic:
+            print(f"Ignoring older upstream release {upstream_version}; spec targets {current_upstream}")
+            return False
+        raise SystemExit("Refusing downgrade; use --allow-downgrade for an intentional manual downgrade")
 
     github_output("current", current)
     github_output("current_upstream", current_upstream)
@@ -187,7 +199,11 @@ def main() -> int:
         default=os.environ.get("RPM_PACKAGER", "rpi-imager-rpm maintainers <packagers@example.invalid>"),
         help="Packager identity for the RPM changelog",
     )
+    parser.add_argument("--allow-downgrade", action="store_true",
+                        help="Allow an intentional downgrade with --version only")
     args = parser.parse_args()
+    if args.allow_downgrade and not args.version:
+        parser.error("--allow-downgrade requires --version")
 
     if args.include_prereleases and not args.latest:
         parser.error("--include-prereleases requires --latest")
@@ -198,7 +214,8 @@ def main() -> int:
         upstream_version = normalize_upstream_version(args.version)
         prerelease = rpm_version_from_upstream(upstream_version) != upstream_version
 
-    update_spec(upstream_version, args.packager, prerelease)
+    update_spec(upstream_version, args.packager, prerelease,
+                allow_downgrade=args.allow_downgrade, automatic=args.latest)
     return 0
 
 

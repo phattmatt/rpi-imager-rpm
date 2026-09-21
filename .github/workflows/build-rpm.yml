@@ -2,141 +2,123 @@ name: Build RPM
 
 on:
   push:
-    branches:
-      - main
-    tags:
-      - rpm-v*
+    branches: [main]
+    tags: [rpm-v*]
   pull_request:
   workflow_dispatch:
     inputs:
       version:
-        description: Upstream version to build, for example 2.0.8. Leave blank to use the spec.
+        description: Upstream version to build. Leave blank to use the spec.
         required: false
         type: string
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  rpm:
-    name: Fedora RPM
+  checks:
+    name: Script and workflow checks
     runs-on: ubuntu-latest
-    container: fedora:latest
-
     steps:
-      - name: Check out packaging repo
-        uses: actions/checkout@v4
-
-      - name: Install RPM build tooling
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - run: sudo apt-get update && sudo apt-get install -y python3-rpm shellcheck
+      - run: |
+          /usr/bin/python3 -m unittest discover -s tests -v
+          shellcheck scripts/*.sh
+          git diff --check
+      - name: Check workflow syntax
         run: |
-          dnf -y install dnf-plugins-core git python3 rpm-build rpmdevtools
-          dnf -y builddep ./rpi-imager.spec
+          go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
+          "$(go env GOPATH)/bin/actionlint"
 
+  rpm:
+    name: Fedora 44 x86_64 RPM
+    needs: checks
+    runs-on: ubuntu-latest
+    container: fedora:44
+    outputs:
+      prerelease: ${{ steps.release_meta.outputs.prerelease }}
+      release_name: ${{ steps.release_meta.outputs.release_name }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Install RPM build tooling
+        run: dnf -y install dnf-plugins-core git python3 python3-rpm rpm-build rpmdevtools
       - name: Apply manual version input
         if: github.event_name == 'workflow_dispatch' && inputs.version != ''
-        run: |
-          python3 scripts/update-version.py --version "${{ inputs.version }}" --packager "GitHub Actions <actions@github.com>"
-
-      - name: Prepare rpmbuild tree
-        run: |
-          mkdir -p .rpmbuild/BUILD .rpmbuild/BUILDROOT .rpmbuild/RPMS .rpmbuild/SOURCES .rpmbuild/SPECS .rpmbuild/SRPMS
-          cp -a patches/*.patch .rpmbuild/SOURCES/
-          cp -a scripts/apply-system-library-overrides.py .rpmbuild/SOURCES/
-
-      - name: Fetch upstream source archive
-        run: |
-          spectool -g -C "$PWD/.rpmbuild/SOURCES" ./rpi-imager.spec
-
+        env:
+          UPSTREAM_VERSION: ${{ inputs.version }}
+        run: python3 scripts/update-version.py --version "$UPSTREAM_VERSION" --packager "GitHub Actions <actions@github.com>"
+      - name: Install declared build dependencies
+        run: dnf -y builddep ./rpi-imager.spec
       - name: Build source and binary RPMs
-        run: |
-          rpmbuild -ba ./rpi-imager.spec --define "_topdir $PWD/.rpmbuild"
-
-      - name: Smoke test RPM install
-        run: |
-          rpm_path="$(find "$PWD/.rpmbuild/RPMS" -type f -name 'rpi-imager-*.rpm' ! -name '*.src.rpm' | sort | head -n 1)"
-          test -n "$rpm_path"
-          dnf -y install "$rpm_path"
-          rpm -q rpi-imager
-          rpm -ql rpi-imager
-          rpm -V rpi-imager
-          test -x /usr/bin/rpi-imager
-          test -f /usr/share/applications/com.raspberrypi.rpi-imager.desktop
-          test -f /usr/share/metainfo/com.raspberrypi.rpi-imager.metainfo.xml
-          test -f /usr/share/polkit-1/actions/com.raspberrypi.rpi-imager.policy
-          ldd /usr/bin/rpi-imager | tee /tmp/rpi-imager-ldd.txt
-          ! grep -q "not found" /tmp/rpi-imager-ldd.txt
-
+        run: bash scripts/build-rpm.sh
       - name: Upload RPM artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: rpi-imager-rpms
+          if-no-files-found: error
           path: |
             .rpmbuild/RPMS/**/*.rpm
             .rpmbuild/SRPMS/*.rpm
-
-      - name: Detect upstream release metadata
+      - name: Validate tag and prepare release
         id: release_meta
         if: startsWith(github.ref, 'refs/tags/rpm-v')
         env:
-          GITHUB_REF_NAME: ${{ github.ref_name }}
+          RELEASE_TAG: ${{ github.ref_name }}
         run: |
-          upstream_version="$(sed -n 's/^%global upstream_version[[:space:]]\+\(.*\)$/\1/p' rpi-imager.spec)"
-          test -n "$upstream_version"
-          export UPSTREAM_VERSION="$upstream_version"
-          python3 - <<'PY'
-          import json
-          import os
-          import urllib.request
-
-          upstream_version = os.environ["UPSTREAM_VERSION"]
-          ref_name = os.environ["GITHUB_REF_NAME"]
-          url = f"https://api.github.com/repos/raspberrypi/rpi-imager/releases/tags/v{upstream_version}"
-          request = urllib.request.Request(
-              url,
-              headers={
-                  "Accept": "application/vnd.github+json",
-                  "User-Agent": "rpi-imager-rpm-release-meta",
-              },
-          )
-          with urllib.request.urlopen(request, timeout=30) as response:
-              data = json.load(response)
-
-          prerelease = bool(data.get("prerelease"))
-          release_name = f"{ref_name} (prerelease)" if prerelease else ref_name
-          lines = [
-              f"Automated RPM build for upstream tag `v{upstream_version}`.",
-              "",
-          ]
-          if prerelease:
-              lines.extend(
-                  [
-                      "> Note: this RPM tracks an upstream Raspberry Pi Imager prerelease.",
-                      "",
-                  ]
-              )
-          lines.extend(
-              [
-                  f"RPM package version: `{ref_name.removeprefix('rpm-v')}`",
-                  "",
-                  "Published asset: installable binary RPM only.",
-              ]
-          )
-          release_body = "\n".join(lines)
-
-          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as handle:
-              handle.write(f"prerelease={'true' if prerelease else 'false'}\n")
-              handle.write(f"release_name={release_name}\n")
-              handle.write("release_body<<EOF\n")
-              handle.write(release_body)
-              handle.write("\nEOF\n")
-          PY
-
-      - name: Publish tag release
+          rpm_path="$(python3 scripts/select-rpm.py .rpmbuild/RPMS)"
+          python3 scripts/prepare-release.py --tag "$RELEASE_TAG" --rpm "$rpm_path"
+      - name: Upload validated release files
         if: startsWith(github.ref, 'refs/tags/rpm-v')
-        uses: softprops/action-gh-release@v2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: ${{ steps.release_meta.outputs.release_name }}
-          prerelease: ${{ steps.release_meta.outputs.prerelease }}
-          body: ${{ steps.release_meta.outputs.release_body }}
-          files: |
-            .rpmbuild/RPMS/*/rpi-imager-[0-9]*.rpm
+          name: release-files
+          path: release/
+          if-no-files-found: error
+
+  install:
+    name: Clean Fedora 44 installation and startup
+    needs: rpm
+    runs-on: ubuntu-latest
+    container: fedora:44
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: rpi-imager-rpms
+          path: artifacts
+      - run: dnf -y --setopt=install_weak_deps=False install python3 rpm
+      - run: bash scripts/smoke-test-rpm.sh artifacts/RPMS
+      - name: Upload startup diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: smoke-test-logs
+          path: /tmp/rpi-imager-*.log
+          if-no-files-found: ignore
+
+  publish:
+    name: Publish validated release
+    if: startsWith(github.ref, 'refs/tags/rpm-v')
+    needs: [rpm, install]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: release-files
+          path: release
+      - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
+        with:
+          name: ${{ needs.rpm.outputs.release_name }}
+          prerelease: ${{ needs.rpm.outputs.prerelease == 'true' }}
+          body_path: release/notes.md
+          files: release/*.rpm
+          fail_on_unmatched_files: true
