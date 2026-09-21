@@ -3,7 +3,7 @@ set -euo pipefail
 
 usage() {
     cat <<'EOF'
-Usage: bash scripts/build-rpm.sh [--install-deps]
+Usage: bash scripts/build-rpm.sh [--install-deps] [-- rpmbuild-options...]
 
 Build source and binary RPMs in .rpmbuild/.
 
@@ -13,22 +13,22 @@ EOF
 }
 
 install_deps=0
-if [[ "${1:-}" == "--install-deps" ]]; then
-    install_deps=1
-elif [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
-    usage
-    exit 0
-elif [[ $# -gt 0 ]]; then
-    usage >&2
-    exit 2
-fi
+rpm_options=()
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --install-deps) install_deps=1; shift ;;
+        --help|-h) usage; exit 0 ;;
+        --) shift; rpm_options=("$@"); break ;;
+        *) usage >&2; exit 2 ;;
+    esac
+done
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd -- "${script_dir}/.." && pwd)"
 topdir="${repo_root}/.rpmbuild"
 
 if [[ "${install_deps}" -eq 1 ]]; then
-    sudo dnf -y install dnf-plugins-core git rpm-build rpmdevtools
+    sudo dnf -y install dnf-plugins-core git python3 rpm-build rpmdevtools
     sudo dnf -y builddep "${repo_root}/rpi-imager.spec"
 fi
 
@@ -45,7 +45,7 @@ rm -f "${topdir}/SOURCES/"*.patch
 cp -a "${repo_root}/patches/"*.patch "${topdir}/SOURCES/"
 cp -a "${repo_root}/scripts/apply-system-library-overrides.py" "${topdir}/SOURCES/"
 
-rpmbuild -ba "${repo_root}/rpi-imager.spec" --define "_topdir ${topdir}"
+rpmbuild -ba "${repo_root}/rpi-imager.spec" --define "_topdir ${topdir}" "${rpm_options[@]}"
 
 cat <<EOF
 

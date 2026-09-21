@@ -22,7 +22,10 @@ jobs:
 
     steps:
       - name: Check out packaging repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Install version comparison dependency
+        run: sudo apt-get update && sudo apt-get install -y python3-rpm
 
       - name: Update spec to latest upstream release
         id: update
@@ -31,10 +34,11 @@ jobs:
           if [[ "${{ github.event_name }}" != "workflow_dispatch" || "${{ inputs.include_prereleases }}" == "true" ]]; then
             args+=(--include-prereleases)
           fi
-          python3 scripts/update-version.py "${args[@]}"
+          /usr/bin/python3 scripts/update-version.py "${args[@]}"
 
       - name: Prepare pull request metadata
         id: pr
+        if: steps.update.outputs.upstream_version != ''
         run: |
           title="Update rpi-imager to ${{ steps.update.outputs.upstream_version }}"
           prerelease_note=""
@@ -56,7 +60,7 @@ jobs:
               echo "$prerelease_note"
               echo
             fi
-            echo "The RPM build workflow will build source and binary RPM artifacts for review."
+            echo "Approve the pending workflows in this PR to run the RPM build and clean installation checks before merging."
             echo
             echo "Selected upstream tag: \`${{ steps.update.outputs.upstream_tag }}\`"
             echo "RPM package version: \`${{ steps.update.outputs.version }}\`"
@@ -65,7 +69,8 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Create update pull request
-        uses: peter-evans/create-pull-request@v6
+        if: steps.update.outputs.upstream_version != ''
+        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6
         with:
           branch: update/rpi-imager-${{ steps.update.outputs.branch_version }}
           commit-message: Update rpi-imager to ${{ steps.update.outputs.upstream_version }}

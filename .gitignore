@@ -4,3 +4,5 @@
 *.src.rpm
 *.log
 /.cache/
+__pycache__/
+/release/

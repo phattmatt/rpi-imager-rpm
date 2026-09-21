@@ -2,11 +2,12 @@
 
 Use this checklist when publishing a new RPM for an upstream Raspberry Pi Imager release.
 
-## Choose the release line
+## Release policy
 
-- Stable releases should normally be published from `main`.
-- Prereleases should normally be published from the active prerelease branch, for example `update/rpi-imager-2.0.11-rc1`.
-- Confirm the branch README and `rpi-imager.spec` agree about which upstream version is being published.
+- Stable and prerelease updates are reviewed and merged into `main`.
+- The daily watcher considers both and ignores versions older than the spec.
+- Prereleases are published as GitHub prereleases, based on upstream release metadata.
+- Use the spec and GitHub Releases as version references; the README does not track a current version.
 
 ## Prepare
 
@@ -18,11 +19,12 @@ Use this checklist when publishing a new RPM for an upstream Raspberry Pi Imager
 
 ## Build
 
-- Build locally on Fedora or wait for the GitHub Actions build.
+- Approve pending workflows on automated update PRs, then wait for the GitHub Actions build (or build locally on Fedora 44 for investigation).
 - Confirm source and binary RPM artifacts were produced.
-- Confirm the install smoke test passed.
+- Confirm the clean Fedora 44 installation and offscreen GUI startup checks passed.
+- Complete a desktop launch and a write/verify test using a spare SD card whose contents can be erased.
 - Review any dependency or file list changes.
-- If the upstream release is a prerelease, expect the RPM metadata version to keep `~rc` ordering while the published RPM filename uses `.rc`.
+- Use RPM metadata for version checks and the actual generated filename for installation.
 
 ## Publish
 
@@ -30,7 +32,7 @@ Use this checklist when publishing a new RPM for an upstream Raspberry Pi Imager
 - Create and push a tag using the `rpm-v<upstream-version>-<rpm-release>` format.
 - For prereleases, keep the Git tag in upstream-style form and do not use `~` in the Git ref.
 - Confirm the GitHub Release contains only the installable binary RPM.
-- For prereleases, confirm the published asset filename matches the built RPM form, for example `rpi-imager-2.0.11.rc1-1.fc44.x86_64.rpm`.
+- Confirm the tag matches the spec upstream version and packaging release, without the Fedora distribution suffix; CI rejects mismatches.
 - Confirm debug and source RPMs remain workflow artifacts only.
 
 Stable example:
@@ -44,7 +46,7 @@ git push origin rpm-v2.0.10-1
 Prerelease example:
 
 ```bash
-git switch update/rpi-imager-2.0.11-rc1
+git switch main
 git tag rpm-v2.0.11-rc1-1
 git push origin rpm-v2.0.11-rc1-1
 ```
