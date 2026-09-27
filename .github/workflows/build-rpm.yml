@@ -15,19 +15,28 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')) }}
+
 jobs:
   checks:
     name: Script and workflow checks
     runs-on: ubuntu-latest
+    outputs:
+      full_build: ${{ steps.changes.outputs.full_build }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0
+      - name: Check changed files and whitespace
+        id: changes
+        run: python3 scripts/ci-changes.py
       - run: sudo apt-get update && sudo apt-get install -y python3-rpm shellcheck
       - run: |
           /usr/bin/python3 -m unittest discover -s tests -v
           shellcheck scripts/*.sh
-          git diff --check
       - name: Check workflow syntax
         run: |
           go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.7
@@ -36,6 +45,7 @@ jobs:
   rpm:
     name: Fedora 44 x86_64 RPM
     needs: checks
+    if: needs.checks.outputs.full_build == 'true'
     runs-on: ubuntu-latest
     container: fedora:44
     outputs:
@@ -103,10 +113,29 @@ jobs:
           path: /tmp/rpi-imager-*.log
           if-no-files-found: ignore
 
+  ci:
+    name: CI
+    if: always()
+    needs: [checks, rpm, install]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify selected checks succeeded
+        env:
+          CHECKS_RESULT: ${{ needs.checks.result }}
+          FULL_BUILD: ${{ needs.checks.outputs.full_build }}
+          RPM_RESULT: ${{ needs.rpm.result }}
+          INSTALL_RESULT: ${{ needs.install.result }}
+        run: |
+          case "$CHECKS_RESULT:$FULL_BUILD:$RPM_RESULT:$INSTALL_RESULT" in
+            success:false:skipped:skipped) echo "Lightweight checks passed; RPM build not required." ;;
+            success:true:success:success) echo "All checks, RPM build, and installation test passed." ;;
+            *) echo "Required checks failed, were cancelled, or did not run." >&2; exit 1 ;;
+          esac
+
   publish:
     name: Publish validated release
     if: startsWith(github.ref, 'refs/tags/rpm-v')
-    needs: [rpm, install]
+    needs: [rpm, install, ci]
     runs-on: ubuntu-latest
     permissions:
       contents: write
