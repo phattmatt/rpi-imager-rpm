@@ -36,7 +36,7 @@ If dependencies are already installed, omit `--install-deps`. Source and binary 
 - `Watch upstream releases` runs daily and proposes updates, including prereleases. Both stable and prerelease updates are reviewed and merged into `main`.
 - Older versions are ignored by automatic updates. Manual downgrades require `--allow-downgrade`.
 - Automated PR workflows require a maintainer to select **Approve workflows to run** before reviewing the build and installation checks. See [GitHub's workflow trigger rules](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow).
-- `Build RPM` checks scripts, builds packages, and tests installation in a fresh Fedora container for pull requests, pushes to `main`, manual runs, and `rpm-v*` tags.
+- `Build RPM` runs lightweight checks on pull requests and pushes to `main`, with full builds and clean installation tests for packaging/build changes. Manual runs and `rpm-v*` tags always build. See [the CI policy](CONTRIBUTING.md#when-ci-builds-rpms).
 - Release tags must be `rpm-v<upstream-version>-<rpm-release>`, without the Fedora distribution suffix. Publication validates the tag and package metadata and waits for installation checks.
 
 Tagged releases publish only the main installable RPM. Debug and source RPMs remain workflow artifacts. Follow [the release checklist](docs/release-checklist.md) to publish.

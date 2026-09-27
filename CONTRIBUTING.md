@@ -64,7 +64,28 @@ shellcheck scripts/*.sh
 git diff --check
 ```
 
-CI also runs actionlint before the RPM build.
+CI also runs actionlint and checks committed whitespace against the PR merge base
+or the complete before/after range of a push. Local `git diff --check` checks your
+uncommitted edits.
+
+## When CI builds RPMs
+
+Every PR and push to `main` runs lightweight checks. Documentation, tests, issue
+templates, Dependabot configuration, and the upstream-watcher workflow can pass
+without building RPMs. Changes to the spec, patches, scripts, build workflow, or
+any unfamiliar path run the full build and clean installation test. Renames and
+deletions count as changes. Release tags and manual runs always build.
+
+The final **CI** check succeeds only if lightweight checks pass and the build and
+installation jobs either both pass or are intentionally skipped. Use **CI** as the
+required branch-protection check instead of the conditional RPM jobs. Missing Git
+comparison history fails the checks rather than silently skipping a build.
+
+New commits cancel superseded runs for the same PR or branch. Release-tag and
+manual runs are separate and are not cancelled by this policy. Dependabot groups
+GitHub Actions updates into one weekly PR, including major updates for review.
+Because these updates change the build workflow, the grouped PR still gets a full
+build; there is no author-based exemption from testing.
 
 ## Update to a new upstream release
 
