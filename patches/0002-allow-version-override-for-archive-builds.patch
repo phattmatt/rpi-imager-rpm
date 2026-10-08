@@ -13,14 +13,8 @@ IMAGER_VERSION_OVERRIDE.
 diff --git a/src/cmake/GenerateVersion.cmake b/src/cmake/GenerateVersion.cmake
 --- a/src/cmake/GenerateVersion.cmake
 +++ b/src/cmake/GenerateVersion.cmake
-@@ -12,7 +12,9 @@ find_package(Git QUIET)
- 
- set(VERSION_STR "0.0.0-unknown")
- 
+@@ -13,1 +13,3 @@
 -if(GIT_EXECUTABLE)
 +if(DEFINED ENV{IMAGER_VERSION_OVERRIDE} AND NOT "$ENV{IMAGER_VERSION_OVERRIDE}" STREQUAL "")
 +    set(VERSION_STR "$ENV{IMAGER_VERSION_OVERRIDE}")
 +elseif(GIT_EXECUTABLE)
-     execute_process(
-         COMMAND "${GIT_EXECUTABLE}" describe --tags --always --dirty
-         WORKING_DIRECTORY "${SOURCE_DIR}"

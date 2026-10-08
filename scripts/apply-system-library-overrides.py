@@ -19,7 +19,7 @@ endif()
 """,
     ),
     "src/dependencies/libarchive.cmake": (
-        "# Bundled libarchive configured for static zlib and zstd\n",
+        "# Bundled libarchive configured for static zlib, zstd and bzip2\n",
         """if(DEFINED ENV{RPM_USE_SYSTEM_LIBS})
     find_package(LibArchive REQUIRED)
     if(TARGET LibArchive::LibArchive)
