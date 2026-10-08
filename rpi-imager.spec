@@ -14,12 +14,12 @@
 %endif
 
 %global udevrulesdir %{_prefix}/lib/udev/rules.d
-%global upstream_version 2.0.11.1
+%global upstream_version 2.0.12
 %global upstream_tag v%{upstream_version}
 
 Name:           rpi-imager
-Version:        2.0.11.1
-Release:        2%{?dist}
+Version:        2.0.12
+Release:        1%{?dist}
 Summary:        Raspberry Pi Imaging utility
 
 License:        Apache-2.0
@@ -124,6 +124,8 @@ xmllint --noout %{buildroot}%{_datadir}/polkit-1/actions/com.raspberrypi.rpi-ima
 %{udevrulesdir}/99-rpiboot.rules
 
 %changelog
+* Thu Oct 08 2026 GitHub Actions <actions@github.com> - 2.0.12-1
+- Update to upstream 2.0.12.
 * Tue Sep 22 2026 phattmatt <19799332+phattmatt@users.noreply.github.com> - 2.0.11.1-2
 - Declare the Python build dependency used during source preparation.
 - Consolidate builds and validate clean installation and release metadata.
